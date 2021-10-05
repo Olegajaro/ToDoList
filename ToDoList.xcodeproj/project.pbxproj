@@ -13,6 +13,7 @@
 		1043FC7E270C4023006CFA91 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1043FC7D270C4023006CFA91 /* Assets.xcassets */; };
 		1043FC81270C4023006CFA91 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1043FC7F270C4023006CFA91 /* LaunchScreen.storyboard */; };
 		1043FC89270C4130006CFA91 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 1043FC88270C4130006CFA91 /* .gitignore */; };
+		1043FC8B270C5149006CFA91 /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1043FC8A270C5149006CFA91 /* TaskViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		1043FC80270C4023006CFA91 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1043FC82270C4023006CFA91 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1043FC88270C4130006CFA91 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		1043FC8A270C5149006CFA91 /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				1043FC7F270C4023006CFA91 /* LaunchScreen.storyboard */,
 				1043FC82270C4023006CFA91 /* Info.plist */,
 				1043FC7A270C4023006CFA91 /* ToDoList.xcdatamodeld */,
+				1043FC8A270C5149006CFA91 /* TaskViewController.swift */,
 			);
 			path = ToDoList;
 			sourceTree = "<group>";
@@ -139,6 +142,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1043FC76270C4023006CFA91 /* TaskListViewController.swift in Sources */,
+				1043FC8B270C5149006CFA91 /* TaskViewController.swift in Sources */,
 				1043FC72270C4023006CFA91 /* AppDelegate.swift in Sources */,
 				1043FC7C270C4023006CFA91 /* ToDoList.xcdatamodeld in Sources */,
 			);
