@@ -59,13 +59,13 @@
 		1043FC70270C4023006CFA91 /* ToDoList */ = {
 			isa = PBXGroup;
 			children = (
-				1043FC71270C4023006CFA91 /* AppDelegate.swift */,
 				1043FC75270C4023006CFA91 /* TaskListViewController.swift */,
-				1043FC7D270C4023006CFA91 /* Assets.xcassets */,
+				10A28F4E270C97A200FE74D0 /* StorageManager.swift */,
+				1043FC71270C4023006CFA91 /* AppDelegate.swift */,
+				1043FC7A270C4023006CFA91 /* ToDoList.xcdatamodeld */,
 				1043FC7F270C4023006CFA91 /* LaunchScreen.storyboard */,
 				1043FC82270C4023006CFA91 /* Info.plist */,
-				1043FC7A270C4023006CFA91 /* ToDoList.xcdatamodeld */,
-				10A28F4E270C97A200FE74D0 /* StorageManager.swift */,
+				1043FC7D270C4023006CFA91 /* Assets.xcassets */,
 			);
 			path = ToDoList;
 			sourceTree = "<group>";
