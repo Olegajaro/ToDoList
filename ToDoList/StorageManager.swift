@@ -37,13 +37,11 @@ class StorageManager {
     func fetchTaskList() -> [Task] {
         let request = Task.fetchRequest()
         var fetchedTaskList: [Task] = []
-        
         do {
             fetchedTaskList = try persistentContainer.viewContext.fetch(request)
         } catch let error {
             print(error)
         }
-        
         return fetchedTaskList
     }
     

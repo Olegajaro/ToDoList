@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 class TaskListViewController: UITableViewController {
     
@@ -33,7 +32,6 @@ class TaskListViewController: UITableViewController {
             blue: 192/255,
             alpha: 194/255
         )
-        
         navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         
@@ -59,6 +57,7 @@ class TaskListViewController: UITableViewController {
             self.save(task)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
         alert.addTextField { textField in
@@ -78,6 +77,13 @@ class TaskListViewController: UITableViewController {
         
         StorageManager.shared.save()
     }
+    
+    private func update(_ taskName: String, _ indexPath: IndexPath) {
+        let selectedTask = self.taskList[indexPath.row]
+        selectedTask.title = taskName
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+        StorageManager.shared.save()
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -94,16 +100,40 @@ extension TaskListViewController {
         cell.contentConfiguration = content
         return cell
     }
-    
+}
+
+// MARK: - UITableViewDelegate
+extension TaskListViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         let task = taskList[indexPath.row]
-        
         let context = StorageManager.shared.getContext()
         context.delete(task)
         taskList.remove(at: indexPath.row)
-        StorageManager.shared.save()
-        
         tableView.deleteRows(at: [indexPath], with: .automatic)
+        StorageManager.shared.save()
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let alert = UIAlertController(
+            title: "Update Task",
+            message: "What do you want to do?",
+            preferredStyle: .alert
+        )
+        
+        let updateAction = UIAlertAction(title: "Save", style: .default) { _ in
+            guard let task = alert.textFields?.first?.text else { return }
+            self.update(task, indexPath)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
+        alert.addAction(updateAction)
+        alert.addAction(cancelAction)
+        alert.addTextField { textField in
+            textField.text = self.taskList[indexPath.row].title
+        }
+        
+        present(alert, animated: true)
     }
 }
+
 
