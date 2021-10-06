@@ -78,6 +78,14 @@ class TaskListViewController: UITableViewController {
         StorageManager.shared.save()
     }
     
+    private func deleteObject(_ object: Task, for indexPath: IndexPath) {
+        let context = StorageManager.shared.getContext()
+        context.delete(object)
+        taskList.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+        StorageManager.shared.save()
+    }
+    
     private func update(_ taskName: String, for indexPath: IndexPath) {
         let selectedTask = self.taskList[indexPath.row]
         selectedTask.title = taskName
@@ -106,11 +114,7 @@ extension TaskListViewController {
 extension TaskListViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         let task = taskList[indexPath.row]
-        let context = StorageManager.shared.getContext()
-        context.delete(task)
-        taskList.remove(at: indexPath.row)
-        tableView.deleteRows(at: [indexPath], with: .automatic)
-        StorageManager.shared.save()
+        self.deleteObject(task, for: indexPath)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
