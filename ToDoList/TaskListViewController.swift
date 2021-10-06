@@ -6,15 +6,9 @@
 //
 
 import UIKit
-import CoreData
-
-protocol TaskViewControllerDelegate {
-    func reloadData()
-}
 
 class TaskListViewController: UITableViewController {
     
-    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     private let cellID = "task"
     private var taskList: [Task] = []
 
@@ -23,44 +17,24 @@ class TaskListViewController: UITableViewController {
         tableView.backgroundColor = .white
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         setupNavigationBar()
-        fetchData()
+        taskList = StorageManager.shared.fetchTaskList()
     }
     
-    // метод для настройки Navigation Bar
     private func setupNavigationBar() {
-        // устанавливаем Title
-        // меняем стиль Navigation bar на Large titles
         title = "Task List"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        // Создаем экземпляр класса UINavigationBarAppearance, который отвечает за внешний вид Navigation Bar
         let navBarAppearance = UINavigationBarAppearance()
         
-        // Настраиваем свойство backgroundColor
         navBarAppearance.backgroundColor = UIColor(
             red: 21/255,
             green: 101/255,
             blue: 192/255,
             alpha: 194/255
         )
-        
-        // Устанавливаем цвет для текста в Navigation Bar
-        // Вначале устанавливаем для свойства titleTextAttributes, которое является словарем.
-        // В словарь нужно передать ключ, отвечающий за параметр, который нужно изменить
-        // и значение по этому ключу, в нашем случае для параметра foregroundColor необходимо установить белый цвет.
-        // Затем присваиваем то же самое значение для свойства largeTitleTextAttributes (текст, который в Large Title).
         navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         
-        // Добавляем кнопку в Navigation Bar для добавления задачи
-        // Для этого нужно у navigationItem вызвать свойство rightBarButtonItem, которое размещает итем справа
-        // и присваиваем ему экземпляр класса UIBarButtonItem
-        // в инициализатор класса передаем 3 параметра:
-        // barButtonSystemItem, отвечающий за предназначение кнопки, в нашем случае это add
-        // target, где будет вызываться данный экземпляр, передаем self, т.к. вызывается в этом же классе
-        // action, действие для кнопки, которое передается через селектор, в котором нужно указать @objc метод
-        // метод будет добавлять новую задачу addNewTask
-        // в этом варианте, этот метод будет служить переходом на другой ViewController, где мы будем создавать и добавлять задачу уже на главный экран
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add,
             target: self,
@@ -68,31 +42,55 @@ class TaskListViewController: UITableViewController {
         )
         
         navigationController?.navigationBar.tintColor = .white
-        // Для того, чтобы Navigation Bar был покрашен во всех его состояниях,
-        // нужно присвоить экземпляр класса UINavigationBarAppearance двум параметрам,
-        // которые отвечают  за состояние Navigation Bar
         navigationController?.navigationBar.standardAppearance = navBarAppearance
         navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
     }
     
     @objc private func addNewTask() {
-        // Для перехода на другой ViewController в методе нужно создать экземпляр этого ViewController.
-        // И чтобы его открыть нужно вызвать метод present, в который необходимо передать два параметра:
-        // первый параметр - это представление, которые мы хотим открыть, т.е наш TaskViewController
-        // второй параметр отвечает за анимацию, почти всегда ставится true, так как все происходит на глазах у пользователя
-        let taskVC = TaskViewController()
-        taskVC.delegate = self
-        present(taskVC, animated: true)
+        showAlert(with: "New Task", and: "What do you want to do?")
     }
     
-    private func fetchData() {
-        let fetchRequest = Task.fetchRequest()
-        
-        do {
-            taskList = try context.fetch(fetchRequest)
-        } catch let error {
-            print("Failed to fetch data", error)
+    private func showAlert(with title: String, and message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+            guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
+            self.save(task)
         }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
+        alert.addTextField { textField in
+            textField.placeholder = "New Task"
+        }
+        
+        present(alert, animated: true)
+    }
+    
+    private func save(_ taskName: String) {
+        let task = StorageManager.shared.getTask()
+        task.title = taskName
+        taskList.append(task)
+        
+        let cellIndex = IndexPath(row: taskList.count - 1, section: 0)
+        tableView.insertRows(at: [cellIndex], with: .automatic)
+        
+        StorageManager.shared.save()
+    }
+    
+    private func deleteObject(_ object: Task, for indexPath: IndexPath) {
+        let context = StorageManager.shared.getContext()
+        context.delete(object)
+        taskList.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+        StorageManager.shared.save()
+    }
+    
+    private func update(_ taskName: String, for indexPath: IndexPath) {
+        let selectedTask = self.taskList[indexPath.row]
+        selectedTask.title = taskName
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+        StorageManager.shared.save()
     }
 }
 
@@ -112,10 +110,34 @@ extension TaskListViewController {
     }
 }
 
-// MARK: - TaskViewControllerDelegate
-extension TaskListViewController: TaskViewControllerDelegate {
-    func reloadData() {
-        fetchData()
-        tableView.reloadData()
+// MARK: - UITableViewDelegate
+extension TaskListViewController {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let task = taskList[indexPath.row]
+        self.deleteObject(task, for: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let alert = UIAlertController(
+            title: "Update Task",
+            message: "What do you want to do?",
+            preferredStyle: .alert
+        )
+        
+        let updateAction = UIAlertAction(title: "Save", style: .default) { _ in
+            guard let task = alert.textFields?.first?.text else { return }
+            self.update(task, for: indexPath)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
+        alert.addAction(updateAction)
+        alert.addAction(cancelAction)
+        alert.addTextField { textField in
+            textField.text = self.taskList[indexPath.row].title
+        }
+        
+        present(alert, animated: true)
     }
 }
+
+
