@@ -78,7 +78,7 @@ class TaskListViewController: UITableViewController {
         StorageManager.shared.save()
     }
     
-    private func update(_ taskName: String, _ indexPath: IndexPath) {
+    private func update(_ taskName: String, for indexPath: IndexPath) {
         let selectedTask = self.taskList[indexPath.row]
         selectedTask.title = taskName
         tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -122,7 +122,7 @@ extension TaskListViewController {
         
         let updateAction = UIAlertAction(title: "Save", style: .default) { _ in
             guard let task = alert.textFields?.first?.text else { return }
-            self.update(task, indexPath)
+            self.update(task, for: indexPath)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
         
